@@ -8,11 +8,12 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import os
+import OSM_kijiji as osm
 
 # open main dataframe
 path = os.getcwd() # only absolute paths on spyder!
 df = pd.read_csv(path + r'/data/housing.csv', index_col=0) # 
-
+db_osm = osm.get_OSM()
 # all ads collected
 dict_ads = {}
 last_page = 20 # last page scraped
@@ -71,7 +72,12 @@ for ad, url in dict_ads.items():
         df.loc[ad, 'pets'] = dict_att['Animaux acceptés']
     except:
         pass
-
+    try:     
+        db_ad = osm.select_in_range(float(df.loc[ad,'latitude']),float(df.loc[ad,'longitude']),db_osm)
+        df.loc[ad,'num_supermarket'] = db_ad.loc[(db_ad['type'] == 'supermarket')].count()['id']
+        df.loc[ad,'dist_smkt'] = db_ad.loc[(db_ad['type'] == 'supermarket')].min()['distance']
+    except:
+        pass
 df.to_csv(path + r'/data/housing.csv')    
 
 
