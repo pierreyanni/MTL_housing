@@ -9,7 +9,7 @@ from OSMPythonTools.nominatim import Nominatim
 from OSMPythonTools.overpass import overpassQueryBuilder, Overpass
 import pandas as pd
 import math
-
+import numpy as np
 
 
 
@@ -21,7 +21,8 @@ def get_OSM():
     query = overpassQueryBuilder(area=areaId, elementType='node', selector=['shop'])+overpassQueryBuilder(area=areaId, elementType='node', selector='amenity')
     result = overpass.query(query)
     db = db_from_OSM(result)
-    return db
+    db_tags = list_tags(db)
+    return db,db_tags
 
 
 
@@ -69,4 +70,14 @@ def select_in_range(lat_kj, long_kj,df):
         long_line = row['long']
         db_select.loc[i,'distance'] = calc_gcd(lat_kj,long_kj,lat_line,long_line)
     return db_select
+
+def list_tags(osm_db):
+    table = pd.pivot_table(osm_db, values='lat', index=['category', 'type'],\
+                           aggfunc=np.sum,fill_value=1)
+    table = list(table.index.values)
+    table = pd.DataFrame(table,columns = ['category','type'])
+    return table
+    
+    
+    
 

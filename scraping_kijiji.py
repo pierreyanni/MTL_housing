@@ -13,10 +13,11 @@ import OSM_kijiji as osm
 # open main dataframe
 path = os.getcwd() # only absolute paths on spyder!
 df = pd.read_csv(path + r'/data/housing.csv', index_col=0) # 
-db_osm = osm.get_OSM()
+db_osm, list_tags_osm = osm.get_OSM()
+
 # all ads collected
 dict_ads = {}
-last_page = 20 # last page scraped
+last_page = 1 # last page scraped
 
 # list of urls of pages of ads
 urls = [f'https://www.kijiji.ca/b-appartement-condo/ville-de-montreal/page-{n}/c37l1700281' 
